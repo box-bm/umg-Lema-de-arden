@@ -1,50 +1,54 @@
-# React + TypeScript + Vite
+# UMG - Lema de Arden
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Este proyecto es una implementación del lema de Arden, un concepto fundamental en la teoría de autómatas y lenguajes formales.
 
-Currently, two official plugins are available:
+## Descripción
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+El lema de Arden es una herramienta matemática utilizada para resolver ecuaciones regulares y encontrar expresiones regulares equivalentes. Este proyecto busca proporcionar una implementación práctica y ejemplos para entender su aplicación.
 
-## Expanding the ESLint configuration
+## Características
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- Resolución de ecuaciones regulares.
+- Generación de expresiones regulares equivalentes.
+- Ejemplos prácticos y casos de prueba.
 
-- Configure the top-level `parserOptions` property like this:
+## Requisitos
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+- Node.js (versión 14 o superior).
+- Un gestor de paquetes como npm o yarn.
+
+## Instalación
+
+1. Clona este repositorio:
+
+   ```bash
+   git clone https://github.com/tu-usuario/umg-Lema-de-arden.git
+   ```
+
+2. Navega al directorio del proyecto:
+
+   ```bash
+   cd umg-Lema-de-arden
+   ```
+
+3. Instala las dependencias:
+
+   ```bash
+   npm install
+   ```
+
+## Uso
+
+Ejecuta el proyecto con el siguiente comando:
+
+```bash
+npm start
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+## Contribuciones
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+Las contribuciones son bienvenidas. Por favor, abre un issue o envía un pull request para sugerir mejoras.
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+## Licencia
+
+Este proyecto está licenciado bajo la [MIT License](LICENSE).
