@@ -1,6 +1,7 @@
 import { EquationPattern } from "./identifyEquationPattern";
 
 export const replaceValues = (replacements: EquationPattern[]) => {
+  if (replacements.length === 0) return "";
   // Usamos el primer elemento del array como punto de partida.
   const startValue = replacements[0].value;
   let result = replacements.find((item) => item.value === startValue)?.equation;

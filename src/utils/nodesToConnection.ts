@@ -16,8 +16,10 @@ const nodeToConnection = (nodes: Node[], edge: Edge): Connection[] => {
 
 export const nodesToConnections = (
   nodes: Node[],
-  edges: Edge[]
+  edges: Edge[],
 ): Connection[] => {
+  if (edges.length === 0) return [];
+
   return edges
     .map((edge) => nodeToConnection(nodes, edge))
     .reduce((current, actual) => [...current, ...actual]);

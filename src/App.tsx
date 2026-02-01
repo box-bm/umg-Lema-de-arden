@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import {
   ReactFlow,
   MiniMap,
@@ -10,15 +10,17 @@ import {
   BackgroundVariant,
   Node,
   Edge,
+  MarkerType,
 } from "@xyflow/react";
 
 import "@xyflow/react/dist/style.css";
 import CustomNode from "./Node";
-import CustomEdge from "./Edge";
 import ArdenResult from "./ArdenResult";
 import AddEdgeForm from "./components/AddEdgeForm";
 
 import { v4 as uuidv4 } from "uuid";
+import SelfConnecting from "./components/SelfConnecting";
+import StateChecklist from "./components/StateChecklist";
 
 const initialNodes: Node[] = [
   {
@@ -40,56 +42,64 @@ const initialNodes: Node[] = [
     data: { label: "q2" },
   },
 ];
+
 const initialEdges: Edge[] = [
+  // self loops
   {
     id: "e1-1",
     source: "1",
     target: "1",
-    type: "custom-edge",
     sourceHandle: "out-top",
     targetHandle: "in",
     label: "0",
+    type: "selfConnecting",
+    markerEnd: { type: MarkerType.Arrow },
   },
   {
     id: "e2-2",
     source: "2",
     target: "2",
-    type: "custom-edge",
     sourceHandle: "out-top",
     targetHandle: "in",
     label: "1",
+    type: "selfConnecting",
+    markerEnd: { type: MarkerType.Arrow },
   },
   {
     id: "e3-3",
     source: "3",
     target: "3",
-    type: "custom-edge",
     sourceHandle: "out-top",
     targetHandle: "in",
     label: "0,1",
+    type: "selfConnecting",
+    markerEnd: { type: MarkerType.Arrow },
   },
+  // noraml edges
   {
     id: "e1-2",
     source: "1",
     target: "2",
-    type: "custom-edge",
     sourceHandle: "out-right",
     targetHandle: "in",
     label: "1",
+    markerEnd: { type: MarkerType.Arrow },
   },
   {
     id: "e2-3",
     source: "2",
     target: "3",
-    type: "custom-edge",
     sourceHandle: "out-right",
     targetHandle: "in",
     label: "0",
+    markerEnd: { type: MarkerType.Arrow },
   },
 ];
 
 const nodeTypes = { custom: CustomNode };
-const edgeTypes = { "custom-edge": CustomEdge };
+const edgeTypes = {
+  selfConnecting: SelfConnecting,
+};
 
 export default function App() {
   const [states, setState] = useState(["0", "1"]);
@@ -104,14 +114,23 @@ export default function App() {
   const onConnect = useCallback(
     (params: any) =>
       setEdges((eds) =>
-        addEdge({ ...params, type: "custom-edge", label: "0" }, eds)
+        addEdge(
+          {
+            ...params,
+            type:
+              params.source === params.target ? "selfConnecting" : undefined,
+            label: "0",
+            markerEnd: { type: MarkerType.Arrow },
+          },
+          eds,
+        ),
       ),
-    [setEdges]
+    [setEdges],
   );
 
   const createNode = (value: string) => {
     const result = nodes.find(
-      ({ data }) => (data.label as string).trim() === value.trim()
+      ({ data }) => (data.label as string).trim() === value.trim(),
     );
 
     if (result) {
@@ -144,43 +163,54 @@ export default function App() {
     if (!id) throw new Error("ID no existe");
 
     setEdges((edges) =>
-      edges.filter(({ target, source }) => ![target, source].includes(id))
+      edges.filter(({ target, source }) => ![target, source].includes(id)),
     );
     setNodes((nodes) => nodes.filter(({ data }) => data.label !== value));
   };
 
-  useEffect(() => {
-    console.log({ edges });
-  }, [edges]);
+  const addStates = (state: string) => {
+    const result = states.find(
+      (s) => s.trim().toLowerCase() === state.trim().toLowerCase(),
+    );
 
-  const addStates = (value: string) => {
-    setState((states) => [...states, value]);
+    if (result) {
+      window.alert("No podemos agregar estados con el mismo nombre");
+      return;
+    }
+
+    setState((states) => [...states, state]);
   };
 
   const removeState = (deletedState: string) => {
     if (states.length <= 2) {
-      window.alert("No se pueden eliminar todos los estados");
+      window.alert("No puedes eliminar más estados");
       return;
     }
 
     setState((states) => states.filter((state) => state != deletedState));
-    setEdges((edges) =>
-      edges.filter(
-        ({ label }) =>
-          !(label as string)
-            .split(",")
-            .map((label) => label.trim())
-            .includes(deletedState)
-      )
-    );
+    const newEdges = edges.filter((edge) => {
+      const labels = edge.label
+        ?.toString()
+        .split(",")
+        .map((s) => s.trim());
+      if (!labels) return true;
+      return !labels.includes(deletedState);
+    });
+    setEdges(newEdges);
   };
 
-  const handleUpdateEdge = (value: string[]) => {
+  const handleUpdateEdge = (value: string[]): boolean => {
+    if (value.length === 0) {
+      window.alert("Un nodo debe tener al menos un estado asignado");
+      return false;
+    }
+
     setEdges((edges) => {
       const index = edges.findIndex((edge) => edge.id === selectedEdge?.id);
       edges[index].label = value.join(",");
       return edges;
     });
+    return true;
   };
 
   const handleUpdateNode = (value: string) => {
@@ -210,18 +240,30 @@ export default function App() {
 
   return (
     <div>
-      <div style={{ minHeight: "10vh", backgroundColor: "#ececec" }}>
+      <div
+        style={{
+          minHeight: "10vh",
+          borderBottomColor: "#ececec",
+          borderBottomWidth: 1,
+          borderBottomStyle: "solid",
+          padding: 12,
+        }}
+      >
         <ArdenResult edges={edges} nodes={nodes} />
       </div>
       <div
         style={{
           position: "absolute",
-          backgroundColor: "#cecece",
+          backgroundColor: "white",
+          borderColor: "#ececec",
+          borderWidth: 1,
+          borderStyle: "solid",
           right: 4,
           marginTop: 4,
           padding: 18,
           borderRadius: 20,
           zIndex: 4,
+          boxShadow: "0px 0px 10px rgba(0,0,0,0.1)",
         }}
       >
         {selection === "none" && (
@@ -229,47 +271,51 @@ export default function App() {
             <h2>Estados</h2>
 
             <AddEdgeForm onPress={addStates} />
-            <div
+            <ul
               style={{
-                gap: 8,
+                margin: "10px 0px",
                 display: "flex",
                 flexDirection: "column",
-                paddingTop: 4,
-                borderTopStyle: "dashed",
-                borderTopWidth: 1,
-                marginTop: 4,
+                gap: 4,
               }}
             >
               {states.map((state) => (
-                <div
+                <li
+                  key={state}
                   style={{ justifyContent: "space-between", display: "flex" }}
                 >
                   <div>{state}</div>
-                  <button onClick={() => removeState(state)}>Eliminar</button>
-                </div>
+                  <button
+                    className={`danger ${states.length <= 2 && "disabled"}`}
+                    disabled={states.length <= 1}
+                    onClick={() => removeState(state)}
+                  >
+                    Eliminar
+                  </button>
+                </li>
               ))}
-            </div>
+            </ul>
 
             <h2>Nodos</h2>
 
             <AddEdgeForm onPress={createNode} />
             <div
               style={{
-                gap: 8,
+                margin: "10px 0px",
                 display: "flex",
                 flexDirection: "column",
-                paddingTop: 4,
-                borderTopStyle: "dashed",
-                borderTopWidth: 1,
-                marginTop: 4,
+                gap: 4,
               }}
             >
               {nodes.map(({ data }) => (
                 <div
+                  key={data.label as string}
                   style={{ justifyContent: "space-between", display: "flex" }}
                 >
                   <div>{data.label as string}</div>
                   <button
+                    className={`danger ${nodes.length <= 1 && "disabled"}`}
+                    disabled={nodes.length <= 1}
                     onClick={() => handleDeleteNode(data.label as string)}
                   >
                     Eliminar
@@ -280,39 +326,61 @@ export default function App() {
           </>
         )}
 
-        {selection === "edge" && (
+        {selection === "edge" && selectedEdge && (
           <>
             <h2>Cambiar de estado</h2>
             <hr />
             <label>Selecciona el nuevo estado</label>
-            <select
-              style={{ width: "100%" }}
-              multiple
-              defaultValue={(selectedEdge?.label as string).split(",")}
-              onChange={(e) =>
-                handleUpdateEdge(
-                  [...e.target.selectedOptions].map((opt) => opt.value)
-                )
-              }
+            <div id="edge-states-select">
+              <StateChecklist
+                states={states}
+                edge={selectedEdge}
+                onStateChanges={handleUpdateEdge}
+              />
+            </div>
+            <button
+              className="danger"
+              onClick={() => {
+                setEdges((eds) => eds.filter((e) => e.id !== selectedEdge?.id));
+                setSelection("none");
+              }}
             >
-              {states.map((state) => (
-                <option value={state}>{state}</option>
-              ))}
-            </select>
+              Eliminar Transicion
+            </button>
           </>
         )}
 
         {selection === "node" && (
           <>
             <h2>Cambiar de nodo</h2>
-            <hr />
-            <label>Selecciona el nuevo valor del nodo</label>
-            <br />
-            <input
-              style={{ width: "100%" }}
+            <p>Selecciona el nuevo valor del nodo</p>
+            <select
+              style={{ width: "100%", margin: "10px 0px" }}
               defaultValue={selectedNode?.data.label as string}
               onChange={(e) => handleUpdateNode(e.target.value)}
-            />
+            >
+              {nodes.map((node) => (
+                <option key={node.id} value={node.data.label as string}>
+                  {node.data.label as string}
+                </option>
+              ))}
+            </select>
+            <button
+              className="danger"
+              onClick={() => {
+                setEdges((eds) =>
+                  eds.filter(
+                    (e) =>
+                      e.source !== selectedNode?.id &&
+                      e.target !== selectedNode?.id,
+                  ),
+                );
+                setNodes((nds) => nds.filter((n) => n.id !== selectedNode?.id));
+                setSelection("none");
+              }}
+            >
+              Eliminar Nodo
+            </button>
           </>
         )}
       </div>
@@ -329,10 +397,12 @@ export default function App() {
           edgeTypes={edgeTypes}
           onPaneClick={handleMinimapSelection}
           onPaneScroll={handleMinimapSelection}
+          fitView
+          fitViewOptions={{ padding: 0.2 }}
         >
           <Controls onFitView={handleMinimapSelection} />
           <MiniMap onClick={handleMinimapSelection} />
-          <Background variant={BackgroundVariant.Lines} gap={12} size={1} />
+          <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
         </ReactFlow>
       </div>
     </div>

@@ -1,24 +1,14 @@
-import { useCallback } from "react";
-import { Handle, Position } from "@xyflow/react";
+import { Handle, NodeProps, Position } from "@xyflow/react";
 
-function CustomNode({ data, isConnectable }) {
-  const onChange = useCallback((evt) => {
-    console.log(evt.target.value);
-  }, []);
+interface CustomNodeProps extends NodeProps {
+  data: {
+    label: string;
+  };
+}
 
-  console.log(data);
-
+function CustomNode({ data, isConnectable, selected }: CustomNodeProps) {
   return (
-    <div
-      style={{
-        minWidth: 80,
-        height: "50px",
-        border: "1px solid #eee",
-        padding: "5px",
-        borderRadius: "5px",
-        background: "white",
-      }}
-    >
+    <>
       <Handle
         type="target"
         position={Position.Left}
@@ -31,15 +21,7 @@ function CustomNode({ data, isConnectable }) {
         id="out-top"
         isConnectable={isConnectable}
       />
-      <div
-        style={{
-          alignItems: "center",
-          justifyContent: "center",
-          textAlign: "center",
-          display: "flex",
-          height: "100%",
-        }}
-      >
+      <div className={`custom-node ${selected ? "selected" : ""}`}>
         <p>{data.label}</p>
       </div>
       <Handle
@@ -48,7 +30,7 @@ function CustomNode({ data, isConnectable }) {
         id="out-right"
         isConnectable={isConnectable}
       />
-    </div>
+    </>
   );
 }
 

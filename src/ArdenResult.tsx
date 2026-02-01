@@ -11,30 +11,25 @@ interface Props {
 const ArdenResult = ({ edges, nodes }: Props) => {
   const connections = nodesToConnections(nodes, edges);
   const ardenResult = resolveArden(connections);
-
   const equations = makeEquations(connections);
 
   return (
-    <>
-      <div style={{ padding: "20px 10px" }}>
-        <h1>Resolución por Arden</h1>
-        <div style={{ display: "flex", paddingTop: 10, gap: 25 }}>
-          <div>
-            <h4>Ecuaciones</h4>
-            <ul style={{ listStyle: "circle" }}>
-              {equations.map((equation) => (
-                <li>{equation}</li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h4>Solución</h4>
-            {ardenResult}
-          </div>
-        </div>
+    <div>
+      <h1>Resolución por Arden</h1>
+      <div style={{ marginTop: 12 }}>
+        <h4>Ecuaciones</h4>
+        <ul style={{ listStyle: "none" }}>
+          {equations.map((equation) => (
+            <li key={equation}>{equation}</li>
+          ))}
+        </ul>
       </div>
-    </>
+
+      <div style={{ marginTop: 12 }}>
+        <h4>Solución</h4>
+        {ardenResult}
+      </div>
+    </div>
   );
 };
 

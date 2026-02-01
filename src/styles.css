@@ -123,3 +123,66 @@ table {
 * {
   font-family: Arial, Helvetica, sans-serif;
 }
+
+input,
+select {
+  outline: none;
+  margin-right: 5px;
+  border: 1px solid #ccc;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+button {
+  cursor: pointer;
+  border-radius: 5px;
+  border: 0;
+  padding: 5px 10px;
+  transition: background-color 0.3s ease;
+}
+
+button.success {
+  background-color: #4caf50;
+  color: white;
+}
+
+button.success:hover {
+  background-color: #45a049;
+}
+
+button.danger {
+  background-color: #f44336;
+  color: white;
+}
+
+button.danger:hover {
+  background-color: #da190b;
+}
+
+button.disabled,
+button.success.disabled,
+button.danger.disabled {
+  background-color: #e0e0e0;
+  color: #a0a0a0;
+  cursor: not-allowed;
+}
+
+.custom-node {
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #cecece;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.custom-node:hover {
+  border-color: #007bff;
+  background-color: #f0f0f0;
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.1);
+}
+
+.custom-node.selected {
+  border-color: #007bff;
+  background-color: #e6f0ff;
+  box-shadow: 0 0 15px rgba(0, 123, 255, 0.2);
+}
